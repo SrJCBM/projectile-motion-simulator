@@ -1,0 +1,25 @@
+# Render Blueprint Configuration
+# This file configures the deployment on Render.com
+
+services:
+  # Web Service - Backend API + Frontend
+  - type: web
+    name: projectile-motion-simulator
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: CORS_ORIGIN
+        value: "*"
+    healthCheckPath: /api/health

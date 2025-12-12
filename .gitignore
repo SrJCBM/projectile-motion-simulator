@@ -70,6 +70,13 @@ web_modules/
 .env.*
 !.env.example
 
+# Server environment variables (IMPORTANT)
+server/.env
+
+# MongoDB and sensitive data
+*.pem
+*.key
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -137,3 +144,20 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Production build
+build/
+dist/
