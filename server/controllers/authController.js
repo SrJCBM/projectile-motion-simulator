@@ -115,6 +115,10 @@ const login = async (req, res) => {
             });
         }
         
+        // Update last login timestamp (UTC-5)
+        user.lastLogin = new Date();
+        await user.save();
+        
         // Generate token
         const token = generateToken(user._id);
         
@@ -124,7 +128,8 @@ const login = async (req, res) => {
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                lastLogin: user.lastLogin
             }
         });
         
@@ -159,6 +164,7 @@ const getMe = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                lastLogin: user.lastLogin,
                 createdAt: user.createdAt
             }
         });

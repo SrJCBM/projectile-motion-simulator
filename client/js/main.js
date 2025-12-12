@@ -53,17 +53,22 @@ function showToast(message, type = 'default') {
 }
 
 /**
- * Formats a date for display
+ * Formats a date for display in UTC-5 (Colombia/Peru/Ecuador time)
  * @param {string} dateString - ISO date string
  * @returns {string} Formatted date
  */
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    
+    // Format in UTC-5 timezone (America/Bogota)
+    return date.toLocaleDateString('es-CO', {
+        timeZone: 'America/Bogota',
         month: 'short',
         day: 'numeric',
+        year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: true
     });
 }
 
@@ -86,7 +91,10 @@ function updateAuthUI() {
         authElements.loginLink.style.display = isLoggedIn ? 'none' : 'flex';
     }
     if (authElements.userName && app.user) {
-        authElements.userName.textContent = app.user.name || 'User';
+        const userName = app.user.name || 'User';
+        const lastLogin = app.user.lastLogin ? `\nÚltimo acceso: ${formatDate(app.user.lastLogin)}` : '';
+        authElements.userName.textContent = userName;
+        authElements.userName.title = `${userName}${lastLogin}`;
     }
 }
 
