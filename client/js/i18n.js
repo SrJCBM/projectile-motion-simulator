@@ -20,6 +20,25 @@ const translations = {
         signInPrompt: '¿Ya tienes cuenta?',
         version: 'Versión',
         
+        // Auth Pages
+        loginTitle: 'Iniciar sesión',
+        loginSubtitle: 'Inicia sesión en tu cuenta para continuar.',
+        loginButton: 'Iniciar sesión',
+        registerTitle: 'Crear cuenta',
+        registerSubtitle: 'Regístrate para guardar tus simulaciones.',
+        registerButton: 'Crear cuenta',
+        nameLabel: 'Nombre',
+        namePlaceholder: 'Tu nombre',
+        emailLabel: 'Correo electrónico',
+        emailPlaceholder: 'ejemplo@correo.com',
+        passwordLabel: 'Contraseña',
+        passwordPlaceholder: '••••••••',
+        confirmPasswordLabel: 'Confirmar contraseña',
+        forgotPassword: '¿Olvidaste tu contraseña?',
+        noAccount: '¿No tienes cuenta?',
+        alreadyHaveAccount: '¿Ya tienes cuenta?',
+        createAccount: 'Crear cuenta',
+        
         // Header
         appTitle: 'Simulador de Movimiento Proyectil',
         signIn: 'Iniciar sesión',
@@ -115,6 +134,25 @@ const translations = {
         useSimulator: 'Use Simulator',
         signInPrompt: 'Already have an account?',
         version: 'Version',
+        
+        // Auth Pages
+        loginTitle: 'Sign In',
+        loginSubtitle: 'Sign in to your account to continue.',
+        loginButton: 'Sign In',
+        registerTitle: 'Create Account',
+        registerSubtitle: 'Register to save your simulations.',
+        registerButton: 'Create Account',
+        nameLabel: 'Name',
+        namePlaceholder: 'Your name',
+        emailLabel: 'Email',
+        emailPlaceholder: 'example@email.com',
+        passwordLabel: 'Password',
+        passwordPlaceholder: '••••••••',
+        confirmPasswordLabel: 'Confirm Password',
+        forgotPassword: 'Forgot your password?',
+        noAccount: 'Don\'t have an account?',
+        alreadyHaveAccount: 'Already have an account?',
+        createAccount: 'Create account',
         
         // Header
         appTitle: 'Projectile Motion Simulator',
@@ -260,6 +298,15 @@ export function updatePageTranslations() {
         const translation = t(key);
         if (translation) {
             el.setAttribute('data-tooltip', translation);
+        }
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const translation = t(key);
+        if (translation) {
+            el.placeholder = translation;
         }
     });
     

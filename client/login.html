@@ -16,21 +16,46 @@
     <link rel="stylesheet" href="css/ui-components.css">
 </head>
 <body>
+    <!-- Theme and Language Controls -->
+    <div class="landing-controls">
+        <div class="lang-selector">
+            <button class="lang-btn lang-btn--active" data-lang="es">ES</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+        </button>
+    </div>
+
     <main class="auth-page">
         <div class="auth-card">
-            <p class="auth-card__brand">Simulador de Movimiento Proyectil</p>
+            <p class="auth-card__brand" data-i18n="appTitle">Simulador de Movimiento Proyectil</p>
             
-            <h1 class="auth-card__title">Iniciar sesión</h1>
-            <p class="auth-card__subtitle">Inicia sesión en tu cuenta para continuar.</p>
+            <h1 class="auth-card__title" data-i18n="loginTitle">Iniciar sesión</h1>
+            <p class="auth-card__subtitle" data-i18n="loginSubtitle">Inicia sesión en tu cuenta para continuar.</p>
             
             <form class="auth-form" id="login-form">
                 <div class="form-group">
-                    <label for="email" class="form-group__label">Correo electrónico</label>
+                    <label for="email" class="form-group__label" data-i18n="emailLabel">Correo electrónico</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email"
                         class="form-group__input" 
+                        data-i18n-placeholder="emailPlaceholder"
                         placeholder="ejemplo@correo.com"
                         required
                         autocomplete="email"
@@ -38,13 +63,14 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="form-group__label">Contraseña</label>
+                    <label for="password" class="form-group__label" data-i18n="passwordLabel">Contraseña</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
                             id="password" 
                             name="password"
                             class="form-group__input" 
+                            data-i18n-placeholder="passwordPlaceholder"
                             placeholder="••••••••"
                             required
                             autocomplete="current-password"
@@ -58,15 +84,15 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn--primary btn--large">
+                <button type="submit" class="btn btn--primary btn--large" data-i18n="loginButton">
                     Iniciar sesión
                 </button>
             </form>
             
             <div class="auth-card__footer">
-                <a href="#" class="auth-card__link">¿Olvidaste tu contraseña?</a>
+                <a href="#" class="auth-card__link" data-i18n="forgotPassword">¿Olvidaste tu contraseña?</a>
                 <p class="auth-card__text">
-                    ¿No tienes cuenta? <a href="register.html" class="auth-card__link">Crear cuenta</a>
+                    <span data-i18n="noAccount">¿No tienes cuenta?</span> <a href="register.html" class="auth-card__link" data-i18n="createAccount">Crear cuenta</a>
                 </p>
             </div>
         </div>
@@ -74,6 +100,7 @@
     
     <script type="module">
         import { login } from './js/api.js';
+        import { initI18n, setLang } from './js/i18n.js';
         
         // Apply saved theme
         const savedTheme = localStorage.getItem('theme') || 'light';
