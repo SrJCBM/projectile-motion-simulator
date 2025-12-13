@@ -10,6 +10,16 @@
  */
 const translations = {
     es: {
+        // Landing Page
+        landingTitle: 'Simulador de Movimiento Proyectil',
+        landingSubtitle: 'Experimenta la física del movimiento parabólico en diferentes entornos gravitacionales',
+        feature1: 'Simulación en tiempo real con gráficos interactivos',
+        feature2: 'Múltiples entornos gravitacionales (Tierra, Luna, Marte)',
+        feature3: 'Guarda y comparte tus simulaciones',
+        useSimulator: 'Usar Simulador',
+        signInPrompt: '¿Ya tienes cuenta?',
+        version: 'Versión',
+        
         // Header
         appTitle: 'Simulador de Movimiento Proyectil',
         signIn: 'Iniciar sesión',
@@ -96,6 +106,16 @@ const translations = {
         gravityMars: '🔴 Marte - 3.72 m/s²'
     },
     en: {
+        // Landing Page
+        landingTitle: 'Projectile Motion Simulator',
+        landingSubtitle: 'Experience the physics of parabolic motion in different gravitational environments',
+        feature1: 'Real-time simulation with interactive graphics',
+        feature2: 'Multiple gravitational environments (Earth, Moon, Mars)',
+        feature3: 'Save and share your simulations',
+        useSimulator: 'Use Simulator',
+        signInPrompt: 'Already have an account?',
+        version: 'Version',
+        
         // Header
         appTitle: 'Projectile Motion Simulator',
         signIn: 'Sign In',

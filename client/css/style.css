@@ -475,12 +475,23 @@ body {
 /* ========================
    Landing Page
    ======================== */
+/* Landing Controls */
+.landing-controls {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    display: flex;
+    gap: var(--spacing-sm);
+    z-index: 100;
+}
+
 .landing {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     padding: var(--spacing-lg);
+    position: relative;
 }
 
 .landing-card {
@@ -489,40 +500,134 @@ body {
     padding: var(--spacing-2xl);
     box-shadow: var(--shadow-xl);
     text-align: center;
-    max-width: 420px;
+    max-width: 480px;
     width: 100%;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .landing-card__version {
     display: inline-block;
     font-size: var(--font-size-xs);
-    color: var(--color-gray-500);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--color-gray-100);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--color-primary-bg);
     border-radius: var(--radius-full);
+    margin-bottom: var(--spacing-lg);
+    letter-spacing: 0.5px;
+}
+
+.landing-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--color-primary-bg);
+    border-radius: var(--radius-xl);
+    color: var(--color-primary);
     margin-bottom: var(--spacing-lg);
 }
 
 .landing-card__title {
-    font-size: var(--font-size-2xl);
+    font-size: 2.25rem;
     font-weight: var(--font-weight-bold);
     color: var(--color-accent);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: var(--spacing-sm);
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-md);
     line-height: 1.2;
 }
 
 .landing-card__subtitle {
     font-size: var(--font-size-base);
-    color: var(--color-gray-500);
+    color: var(--color-gray-600);
     margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.landing-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    text-align: left;
+}
+
+.landing-feature {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+}
+
+.landing-feature svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.btn--hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-md) var(--spacing-xl);
+    box-shadow: 0 8px 24px rgba(42, 157, 143, 0.35);
+    transition: all var(--transition-base);
+}
+
+.btn--hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(42, 157, 143, 0.45);
+}
+
+.btn--hero svg {
+    transition: transform var(--transition-fast);
+}
+
+.btn--hero:hover svg {
+    transform: translateX(4px);
 }
 
 .landing-card__divider {
     font-size: var(--font-size-sm);
     color: var(--color-gray-400);
-    margin: var(--spacing-lg) 0;
+    margin: var(--spacing-xl) 0 var(--spacing-md);
+    position: relative;
+}
+
+.landing-card__divider::before,
+.landing-card__divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: var(--color-gray-200);
+}
+
+.landing-card__divider::before {
+    left: 0;
+}
+
+.landing-card__divider::after {
+    right: 0;
 }
 
 /* ========================
@@ -980,19 +1085,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 3px solid var(--color-primary);
-    position: relative;
-}
-
-.control-panel__title::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: var(--color-primary-light);
 }
 
 .results-panel__title {
