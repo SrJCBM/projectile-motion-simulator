@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Create an account - Projectile Motion Simulator">
+    <meta name="description" content="Crear cuenta - Simulador de Movimiento Proyectil">
     <meta name="theme-color" content="#2a9d8f">
     
-    <title>Create Account - Projectile Motion Simulator</title>
+    <title>Crear Cuenta - Simulador de Movimiento Proyectil</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,40 +18,40 @@
 <body>
     <main class="auth-page">
         <div class="auth-card">
-            <p class="auth-card__brand">Projectile Motion Simulator</p>
+            <p class="auth-card__brand">Simulador de Movimiento Proyectil</p>
             
-            <h1 class="auth-card__title">Create account</h1>
-            <p class="auth-card__subtitle">Sign up to save your simulations.</p>
+            <h1 class="auth-card__title">Crear cuenta</h1>
+            <p class="auth-card__subtitle">Regístrate para guardar tus simulaciones.</p>
             
             <form class="auth-form" id="register-form">
                 <div class="form-group">
-                    <label for="name" class="form-group__label">Name</label>
+                    <label for="name" class="form-group__label">Nombre</label>
                     <input 
                         type="text" 
                         id="name" 
                         name="name"
                         class="form-group__input" 
-                        placeholder="Your name"
+                        placeholder="Tu nombre"
                         required
                         autocomplete="name"
                     >
                 </div>
                 
                 <div class="form-group">
-                    <label for="email" class="form-group__label">Email</label>
+                    <label for="email" class="form-group__label">Correo electrónico</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email"
                         class="form-group__input" 
-                        placeholder="example@email.com"
+                        placeholder="ejemplo@correo.com"
                         required
                         autocomplete="email"
                     >
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="form-group__label">Password</label>
+                    <label for="password" class="form-group__label">Contraseña</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
@@ -63,7 +63,7 @@
                             minlength="6"
                             autocomplete="new-password"
                         >
-                        <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <button type="button" class="password-toggle" aria-label="Mostrar/ocultar contraseña">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
@@ -73,7 +73,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="confirm-password" class="form-group__label">Confirm Password</label>
+                    <label for="confirm-password" class="form-group__label">Confirmar contraseña</label>
                     <input 
                         type="password" 
                         id="confirm-password" 
@@ -87,13 +87,13 @@
                 </div>
                 
                 <button type="submit" class="btn btn--primary btn--large">
-                    Create account
+                    Crear cuenta
                 </button>
             </form>
             
             <div class="auth-card__footer">
                 <p class="auth-card__text">
-                    Already have an account? <a href="login.html" class="auth-card__link">Sign in</a>
+                    ¿Ya tienes cuenta? <a href="login.html" class="auth-card__link">Iniciar sesión</a>
                 </p>
             </div>
         </div>
@@ -101,6 +101,10 @@
     
     <script type="module">
         import { register } from './js/api.js';
+        
+        // Apply saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         
         const form = document.getElementById('register-form');
         const passwordToggle = document.querySelector('.password-toggle');
@@ -122,7 +126,7 @@
             const confirmPassword = document.getElementById('confirm-password').value;
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
+                alert('Las contraseñas no coinciden');
                 return;
             }
             
@@ -130,7 +134,7 @@
                 await register({ name, email, password });
                 window.location.href = 'simulator.html';
             } catch (error) {
-                alert(error.message || 'Registration failed. Please try again.');
+                alert(error.message || 'Error al crear cuenta. Por favor intenta de nuevo.');
             }
         });
     </script>

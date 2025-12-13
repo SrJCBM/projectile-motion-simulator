@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive Projectile Motion Simulator - Explore physics of projectile motion">
+    <meta name="description" content="Simulador Interactivo de Movimiento Proyectil - Explora la física del movimiento parabólico">
     <meta name="theme-color" content="#2a9d8f">
     
-    <title>Projectile Motion Simulator</title>
+    <title>Simulador de Movimiento Proyectil</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,20 +20,25 @@
         <div class="landing-card">
             <span class="landing-card__version">v1.0</span>
             
-            <h1 class="landing-card__title">Projectile Motion<br>Simulator</h1>
-            <p class="landing-card__subtitle">Explore the physics of projectile motion.</p>
+            <h1 class="landing-card__title">Simulador de<br>Movimiento Proyectil</h1>
+            <p class="landing-card__subtitle">Explora la física del movimiento parabólico.</p>
             
             <a href="simulator.html" class="btn btn--primary btn--large">
-                Use Simulator
+                Usar Simulador
             </a>
             
-            <p class="landing-card__divider">Sign in to save your progress</p>
+            <p class="landing-card__divider">Inicia sesión para guardar tu progreso</p>
             
             <a href="login.html" class="btn btn--outline btn--large">
-                Sign In
+                Iniciar Sesión
             </a>
         </div>
     </main>
+    
+    <script>
+        // Apply saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
 </body>
 </html>
-    <main id="main-content" class="main">

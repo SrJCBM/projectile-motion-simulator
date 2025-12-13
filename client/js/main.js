@@ -7,6 +7,7 @@
 
 import { UIController } from './ui.js';
 import * as api from './api.js';
+import { initI18n, t, setLang, getCurrentLang } from './i18n.js';
 
 /**
  * Application State
@@ -15,7 +16,8 @@ const app = {
     ui: null,
     initialized: false,
     user: null,
-    historyOpen: false
+    historyOpen: false,
+    simulationState: 'ready' // 'ready', 'running', 'paused', 'completed'
 };
 
 /**
@@ -32,15 +34,40 @@ const authElements = {
     historyList: null,
     historyCloseBtn: null,
     historyOverlay: null,
-    toastContainer: null
+    toastContainer: null,
+    themeToggle: null,
+    downloadPdfBtn: null,
+    loadingOverlay: null,
+    canvasLoading: null,
+    simulationStatus: null
 };
 
 /**
+ * Theme management
+ */
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    authElements.themeToggle = document.getElementById('theme-toggle');
+    authElements.themeToggle?.addEventListener('click', toggleTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
+/**
  * Shows a toast notification
- * @param {string} message - Message to display
+ * @param {string} messageKey - i18n key or message to display
  * @param {string} type - Type: 'success', 'error', or default
  */
-function showToast(message, type = 'default') {
+function showToast(messageKey, type = 'default') {
+    const message = t(messageKey) || messageKey;
     const toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
     toast.textContent = message;
@@ -50,6 +77,66 @@ function showToast(message, type = 'default') {
     setTimeout(() => {
         toast.remove();
     }, 3000);
+}
+
+/**
+ * Updates the simulation status indicator
+ * @param {string} state - 'ready', 'running', 'paused', 'completed'
+ */
+function updateSimulationStatus(state) {
+    app.simulationState = state;
+    const statusEl = authElements.simulationStatus;
+    if (!statusEl) return;
+    
+    // Remove all state classes
+    statusEl.classList.remove('simulation-status--running', 'simulation-status--paused', 'simulation-status--completed');
+    
+    const textEl = statusEl.querySelector('.simulation-status__text');
+    
+    switch (state) {
+        case 'running':
+            statusEl.classList.add('simulation-status--running');
+            if (textEl) textEl.textContent = t('statusRunning');
+            break;
+        case 'paused':
+            statusEl.classList.add('simulation-status--paused');
+            if (textEl) textEl.textContent = t('statusPaused');
+            break;
+        case 'completed':
+            statusEl.classList.add('simulation-status--completed');
+            if (textEl) textEl.textContent = t('statusCompleted');
+            break;
+        default:
+            if (textEl) textEl.textContent = t('statusReady');
+    }
+}
+
+/**
+ * Shows loading overlay
+ */
+function showLoading() {
+    authElements.loadingOverlay?.classList.add('loading-overlay--visible');
+}
+
+/**
+ * Hides loading overlay
+ */
+function hideLoading() {
+    authElements.loadingOverlay?.classList.remove('loading-overlay--visible');
+}
+
+/**
+ * Shows canvas loading indicator
+ */
+function showCanvasLoading() {
+    authElements.canvasLoading?.classList.add('canvas-loading--visible');
+}
+
+/**
+ * Hides canvas loading indicator
+ */
+function hideCanvasLoading() {
+    authElements.canvasLoading?.classList.remove('canvas-loading--visible');
 }
 
 /**
@@ -140,7 +227,7 @@ function handleLogout() {
     app.user = null;
     updateAuthUI();
     closeHistory();
-    showToast('Logged out successfully', 'success');
+    showToast('loggedOut', 'success');
 }
 
 /**
@@ -148,7 +235,7 @@ function handleLogout() {
  */
 async function saveSimulation() {
     if (!app.user) {
-        showToast('Please log in to save simulations', 'error');
+        showToast('loginRequired', 'error');
         return;
     }
     
@@ -156,7 +243,8 @@ async function saveSimulation() {
     const results = app.ui.renderer.calculateResults();
     
     // Prompt for name
-    const name = prompt('Enter a name for this simulation:', `Simulation ${new Date().toLocaleDateString()}`);
+    const defaultName = `Simulación ${new Date().toLocaleDateString()}`;
+    const name = prompt(t('enterName'), defaultName);
     
     if (!name) return; // Cancelled
     
@@ -177,7 +265,7 @@ async function saveSimulation() {
             }
         });
         
-        showToast('Simulation saved!', 'success');
+        showToast('simulationSaved', 'success');
         
         // Refresh history if open
         if (app.historyOpen) {
@@ -185,7 +273,70 @@ async function saveSimulation() {
         }
     } catch (error) {
         console.error('Save failed:', error);
-        showToast('Failed to save simulation', 'error');
+        showToast('saveFailed', 'error');
+    }
+}
+
+/**
+ * Downloads PDF report
+ */
+async function downloadPDF() {
+    if (!app.user) {
+        showToast('loginRequired', 'error');
+        return;
+    }
+    
+    const params = app.ui.getParams();
+    const results = app.ui.renderer.calculateResults();
+    
+    try {
+        showLoading();
+        
+        const apiBase = (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+            ? '/api'
+            : 'http://localhost:3000/api';
+        
+        const response = await fetch(`${apiBase}/reports/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({
+                params: {
+                    initialVelocity: params.initialVelocity,
+                    launchAngle: params.launchAngle,
+                    initialHeight: params.initialHeight,
+                    gravity: params.gravity
+                },
+                results: {
+                    maxHeight: results.maxHeight,
+                    range: results.range,
+                    flightTime: results.flightTime,
+                    finalVelocity: results.finalVelocity
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to generate PDF');
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `simulacion-${Date.now()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+    } catch (error) {
+        console.error('PDF download failed:', error);
+        showToast('pdfFailed', 'error');
+    } finally {
+        hideLoading();
     }
 }
 
@@ -317,10 +468,10 @@ async function loadSimulation(id) {
         });
         
         closeHistory();
-        showToast('Simulation loaded!', 'success');
+        showToast('simulationLoaded', 'success');
     } catch (error) {
         console.error('Load failed:', error);
-        showToast('Failed to load simulation', 'error');
+        showToast('loadFailed', 'error');
     }
 }
 
@@ -329,15 +480,15 @@ async function loadSimulation(id) {
  * @param {string} id - Simulation ID
  */
 async function deleteSimulation(id) {
-    if (!confirm('Are you sure you want to delete this simulation?')) return;
+    if (!confirm(t('confirmDelete'))) return;
     
     try {
         await api.deleteSimulation(id);
-        showToast('Simulation deleted', 'success');
+        showToast('simulationDeleted', 'success');
         loadHistory();
     } catch (error) {
         console.error('Delete failed:', error);
-        showToast('Failed to delete simulation', 'error');
+        showToast('deleteFailed', 'error');
     }
 }
 
@@ -357,6 +508,10 @@ function initAuthListeners() {
     authElements.historyCloseBtn = document.getElementById('history-close-btn');
     authElements.historyOverlay = document.getElementById('history-overlay');
     authElements.toastContainer = document.getElementById('toast-container');
+    authElements.downloadPdfBtn = document.getElementById('download-pdf-btn');
+    authElements.loadingOverlay = document.getElementById('loading-overlay');
+    authElements.canvasLoading = document.getElementById('canvas-loading');
+    authElements.simulationStatus = document.getElementById('simulation-status');
     
     // Add event listeners
     authElements.saveBtn?.addEventListener('click', saveSimulation);
@@ -364,6 +519,65 @@ function initAuthListeners() {
     authElements.logoutBtn?.addEventListener('click', handleLogout);
     authElements.historyCloseBtn?.addEventListener('click', closeHistory);
     authElements.historyOverlay?.addEventListener('click', closeHistory);
+    authElements.downloadPdfBtn?.addEventListener('click', downloadPDF);
+}
+
+/**
+ * Updates UI for logged in users (show PDF button)
+ */
+function updateLoggedInUI() {
+    if (authElements.downloadPdfBtn) {
+        authElements.downloadPdfBtn.style.display = api.isAuthenticated() && app.user ? 'flex' : 'none';
+    }
+}
+
+/**
+ * Sets up callbacks for simulation state changes
+ */
+function setupSimulationCallbacks() {
+    // Listen for simulate button click
+    const simulateBtn = document.getElementById('simulate-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    
+    // Override simulate button behavior
+    simulateBtn?.addEventListener('click', () => {
+        showCanvasLoading();
+        updateSimulationStatus('running');
+        simulateBtn.classList.remove('btn--simulate-ready');
+        
+        // Hide loading after a brief delay (simulation starts)
+        setTimeout(() => {
+            hideCanvasLoading();
+        }, 300);
+    }, true); // Use capture to run before ui.js handler
+    
+    // Listen for pause
+    pauseBtn?.addEventListener('click', () => {
+        // Check current state by looking at renderer's isPaused state
+        if (app.ui?.renderer?.isPaused) {
+            updateSimulationStatus('running');
+        } else {
+            updateSimulationStatus('paused');
+        }
+    });
+    
+    // Listen for reset
+    resetBtn?.addEventListener('click', () => {
+        updateSimulationStatus('ready');
+        simulateBtn?.classList.add('btn--simulate-ready');
+    });
+    
+    // Poll for animation complete
+    setInterval(() => {
+        if (app.ui?.renderer) {
+            const renderer = app.ui.renderer;
+            // Check if animation finished (was running but now stopped)
+            if (!renderer.isAnimating && app.simulationState === 'running') {
+                updateSimulationStatus('completed');
+            }
+        }
+    }, 250);
 }
 
 /**
@@ -379,12 +593,22 @@ async function initApp() {
     try {
         console.log('🚀 Initializing Projectile Motion Simulator...');
         
+        // Initialize theme
+        initTheme();
+        
+        // Initialize i18n (translations)
+        initI18n();
+        
         // Initialize UI Controller
         app.ui = new UIController();
         
         // Initialize auth-related features
         initAuthListeners();
         await checkAuthStatus();
+        updateLoggedInUI();
+        
+        // Setup simulation state callbacks
+        setupSimulationCallbacks();
         
         // Mark as initialized
         app.initialized = true;

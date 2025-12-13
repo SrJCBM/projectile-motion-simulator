@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sign in to Projectile Motion Simulator">
+    <meta name="description" content="Iniciar sesión - Simulador de Movimiento Proyectil">
     <meta name="theme-color" content="#2a9d8f">
     
-    <title>Sign In - Projectile Motion Simulator</title>
+    <title>Iniciar sesión - Simulador de Movimiento Proyectil</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,27 +18,27 @@
 <body>
     <main class="auth-page">
         <div class="auth-card">
-            <p class="auth-card__brand">Projectile Motion Simulator</p>
+            <p class="auth-card__brand">Simulador de Movimiento Proyectil</p>
             
-            <h1 class="auth-card__title">Sign in</h1>
-            <p class="auth-card__subtitle">Sign in to your account to continue.</p>
+            <h1 class="auth-card__title">Iniciar sesión</h1>
+            <p class="auth-card__subtitle">Inicia sesión en tu cuenta para continuar.</p>
             
             <form class="auth-form" id="login-form">
                 <div class="form-group">
-                    <label for="email" class="form-group__label">Email</label>
+                    <label for="email" class="form-group__label">Correo electrónico</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email"
                         class="form-group__input" 
-                        placeholder="example@email.com"
+                        placeholder="ejemplo@correo.com"
                         required
                         autocomplete="email"
                     >
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="form-group__label">Password</label>
+                    <label for="password" class="form-group__label">Contraseña</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
@@ -49,7 +49,7 @@
                             required
                             autocomplete="current-password"
                         >
-                        <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <button type="button" class="password-toggle" aria-label="Mostrar/ocultar contraseña">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
@@ -59,14 +59,14 @@
                 </div>
                 
                 <button type="submit" class="btn btn--primary btn--large">
-                    Sign in
+                    Iniciar sesión
                 </button>
             </form>
             
             <div class="auth-card__footer">
-                <a href="#" class="auth-card__link">Forgot password?</a>
+                <a href="#" class="auth-card__link">¿Olvidaste tu contraseña?</a>
                 <p class="auth-card__text">
-                    Don't have an account? <a href="register.html" class="auth-card__link">Create account</a>
+                    ¿No tienes cuenta? <a href="register.html" class="auth-card__link">Crear cuenta</a>
                 </p>
             </div>
         </div>
@@ -74,6 +74,10 @@
     
     <script type="module">
         import { login } from './js/api.js';
+        
+        // Apply saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         
         const form = document.getElementById('login-form');
         const passwordToggle = document.querySelector('.password-toggle');
@@ -96,7 +100,7 @@
                 await login({ email, password });
                 window.location.href = 'simulator.html';
             } catch (error) {
-                alert(error.message || 'Login failed. Please try again.');
+                alert(error.message || 'Error al iniciar sesión. Por favor intenta de nuevo.');
             }
         });
     </script>
