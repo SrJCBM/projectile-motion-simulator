@@ -187,9 +187,12 @@ body {
 .header__title {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-accent);
+    color: var(--color-gray-800);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+    text-decoration: none;
+    border: none;
 }
 
 .header__actions {
