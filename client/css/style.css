@@ -298,6 +298,25 @@ body {
     overflow: hidden;
 }
 
+.preview-badge {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--color-primary-bg);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    padding: 6px 10px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-md);
+    z-index: var(--z-tooltip);
+}
+
+[data-theme="dark"] .preview-badge {
+    background: rgba(42, 157, 143, 0.15);
+    color: var(--color-primary-light);
+}
+
 .simulation-canvas {
     width: 100%;
     height: 280px;

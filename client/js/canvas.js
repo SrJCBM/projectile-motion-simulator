@@ -244,7 +244,9 @@ class CanvasRenderer {
         this.clear();
         this.drawGrid();
         this.drawGround();
-        this.drawTrajectory(this.trajectoryPoints);
+        // Emphasize only the local segment up to the hovered X;
+        // fade the remaining path to reduce visual clutter.
+        this.drawTrajectorySegment(this.trajectoryPoints, hoverX);
         this.drawLauncher(this.params.launchAngle, this.params.initialHeight);
         
         // Draw final projectile position
@@ -283,6 +285,59 @@ class CanvasRenderer {
         ctx.beginPath();
         ctx.arc(canvasX, canvasY, 4, 0, Math.PI * 2);
         ctx.fill();
+    }
+
+    /**
+     * Draws the trajectory emphasizing the segment up to a split X position.
+     * The portion after the split is rendered with lower opacity.
+     * @param {Array} points - Array of trajectory points
+     * @param {number} splitX - Physics X (meters) where emphasis should end
+     */
+    drawTrajectorySegment(points, splitX) {
+        if (!points || points.length < 2) return;
+        const ctx = this.ctx;
+
+        // Find index closest to splitX
+        let splitIndex = points.length - 1;
+        for (let i = 0; i < points.length; i++) {
+            if (points[i].x >= splitX) {
+                splitIndex = i;
+                break;
+            }
+        }
+
+        // Draw emphasized segment (from start to splitIndex)
+        ctx.save();
+        ctx.strokeStyle = this.colors.trajectory;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        let start = this.toCanvasCoords(points[0].x, points[0].y);
+        ctx.moveTo(start.canvasX, start.canvasY);
+        for (let i = 1; i <= splitIndex; i++) {
+            const p = this.toCanvasCoords(points[i].x, points[i].y);
+            ctx.lineTo(p.canvasX, p.canvasY);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw de-emphasized remainder (after splitIndex)
+        if (splitIndex < points.length - 1) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(45, 156, 219, 0.25)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            const s2 = this.toCanvasCoords(points[splitIndex].x, points[splitIndex].y);
+            ctx.moveTo(s2.canvasX, s2.canvasY);
+            for (let i = splitIndex + 1; i < points.length; i++) {
+                const p = this.toCanvasCoords(points[i].x, points[i].y);
+                ctx.lineTo(p.canvasX, p.canvasY);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
     }
     
     /**

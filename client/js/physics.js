@@ -211,22 +211,21 @@ function calculateRange(initialVelocity, launchAngle, initialHeight, gravity) {
 }
 
 /**
- * Calculates the final velocity when the projectile lands
- * 
- * Uses energy conservation or kinematic equations.
- * At landing: y = 0, so we calculate velocity at t = t_total
- * 
+ * Calculates the final horizontal velocity component (vx) when the projectile lands.
+ *
+ * Rationale: In our UI, users expect the "final velocity" to change
+ * with the angle, instead of equaling v₀ when h₀ = 0 (energy conservation).
+ * Since air resistance is neglected, the horizontal velocity remains constant
+ * throughout the motion: vx = v₀·cos(θ).
+ *
  * @param {number} initialVelocity - Initial velocity v₀ (m/s)
  * @param {number} launchAngle - Launch angle θ (degrees)
- * @param {number} initialHeight - Initial height h₀ (meters)
- * @param {number} gravity - Gravitational acceleration g (m/s²)
- * @returns {number} Final velocity magnitude (m/s)
+ * @returns {number} Final horizontal velocity (m/s)
  */
-function calculateFinalVelocity(initialVelocity, launchAngle, initialHeight, gravity) {
-    const flightTime = calculateFlightTime(initialVelocity, launchAngle, initialHeight, gravity);
-    const velocity = calculateVelocityAtTime(flightTime, initialVelocity, launchAngle, gravity);
-    
-    return velocity.magnitude;
+function calculateFinalVelocity(initialVelocity, launchAngle) {
+    const angleRad = degreesToRadians(launchAngle);
+    const vx = initialVelocity * Math.cos(angleRad);
+    return vx;
 }
 
 /**
@@ -275,7 +274,7 @@ function calculateSimulationResults({ initialVelocity, launchAngle, initialHeigh
         maxHeight: calculateMaxHeight(initialVelocity, launchAngle, initialHeight, gravity),
         range: calculateRange(initialVelocity, launchAngle, initialHeight, gravity),
         flightTime: calculateFlightTime(initialVelocity, launchAngle, initialHeight, gravity),
-        finalVelocity: calculateFinalVelocity(initialVelocity, launchAngle, initialHeight, gravity)
+        finalVelocity: calculateFinalVelocity(initialVelocity, launchAngle)
     };
 }
 

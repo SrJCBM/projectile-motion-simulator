@@ -44,6 +44,7 @@ class UIController {
             
             // Canvas
             canvas: document.getElementById('simulation-canvas'),
+            previewBadge: document.getElementById('preview-badge'),
             
             // Current time display (optional)
             currentTime: document.getElementById('current-time')
@@ -343,11 +344,11 @@ class UIController {
      * Updates the trajectory preview
      */
     updatePreview() {
-        // Only update preview if not currently simulating
+        // Only update the canvas preview; do not change result values here.
+        // This prevents results from jumping instantly when moving sliders.
         if (this.simulationState === 'idle' || this.simulationState === 'completed') {
             this.renderer.setParams(this.params);
-            const results = this.renderer.updatePreview();
-            this.displayResults(results);
+            this.renderer.updatePreview();
         }
     }
     
@@ -438,7 +439,7 @@ class UIController {
      * Updates button states based on simulation state
      */
     updateButtonStates() {
-        const { simulateBtn, pauseBtn, resetBtn } = this.elements;
+        const { simulateBtn, pauseBtn, resetBtn, previewBadge } = this.elements;
         
         switch (this.simulationState) {
             case 'idle':
@@ -453,6 +454,7 @@ class UIController {
                 if (resetBtn) {
                     resetBtn.disabled = true;
                 }
+                if (previewBadge) previewBadge.style.display = 'inline-flex';
                 break;
                 
             case 'running':
@@ -466,6 +468,7 @@ class UIController {
                 if (resetBtn) {
                     resetBtn.disabled = false;
                 }
+                if (previewBadge) previewBadge.style.display = 'none';
                 break;
                 
             case 'paused':
@@ -479,6 +482,7 @@ class UIController {
                 if (resetBtn) {
                     resetBtn.disabled = false;
                 }
+                if (previewBadge) previewBadge.style.display = 'none';
                 break;
                 
             case 'completed':
@@ -493,6 +497,7 @@ class UIController {
                 if (resetBtn) {
                     resetBtn.disabled = false;
                 }
+                if (previewBadge) previewBadge.style.display = 'none';
                 break;
         }
     }

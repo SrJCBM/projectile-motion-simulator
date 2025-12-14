@@ -45,6 +45,7 @@ const translations = {
         history: 'Historial',
         save: 'Guardar',
         downloadPDF: 'PDF',
+        previewBadge: 'Vista previa',
         
         // Controls
         parameters: 'Parámetros',
@@ -163,6 +164,7 @@ const translations = {
         history: 'History',
         save: 'Save',
         downloadPDF: 'PDF',
+        previewBadge: 'Preview',
         
         // Controls
         parameters: 'Parameters',
