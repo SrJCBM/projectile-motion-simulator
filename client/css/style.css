@@ -360,6 +360,21 @@ body {
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-gray-200);
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Animation for counting up */
+.result-card .result-card__value {
+    transition: color 0.3s ease;
+}
+
+.result-card.counting .result-card__value {
+    color: var(--color-primary);
 }
 
 .result-card__icon {
@@ -1021,6 +1036,60 @@ body {
     font-size: var(--font-size-sm);
     color: var(--color-gray-600);
     font-weight: var(--font-weight-medium);
+}
+
+/* ========================
+   Canvas Tooltip
+   ======================== */
+.canvas-tooltip {
+    position: absolute;
+    background: var(--color-gray-800);
+    color: var(--color-white);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-lg);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: var(--z-tooltip);
+    min-width: 140px;
+}
+
+.canvas-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.canvas-tooltip__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: 2px 0;
+}
+
+.canvas-tooltip__label {
+    color: var(--color-gray-400);
+    font-weight: var(--font-weight-medium);
+}
+
+.canvas-tooltip__value {
+    color: var(--color-primary-light);
+    font-weight: var(--font-weight-semibold);
+}
+
+[data-theme="dark"] .canvas-tooltip {
+    background: var(--color-gray-100);
+    color: var(--color-gray-800);
+}
+
+[data-theme="dark"] .canvas-tooltip__label {
+    color: var(--color-gray-500);
+}
+
+[data-theme="dark"] .canvas-tooltip__value {
+    color: var(--color-primary);
 }
 
 /* ========================

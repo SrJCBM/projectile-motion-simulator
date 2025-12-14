@@ -13,6 +13,7 @@ import {
     generateTrajectoryPoints,
     calculateSimulationResults 
 } from './physics.js';
+import { t } from './i18n.js';
 
 /**
  * Canvas Renderer Class
@@ -61,11 +62,18 @@ class CanvasRenderer {
         this.trajectoryPoints = [];
         this.previewPoints = [];
         
+        // Tooltip state
+        this.showTooltip = false;
+        this.tooltipData = null;
+        
         // Bind methods
         this.animate = this.animate.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
         
         // Initialize
         this.setupCanvas();
+        this.setupTooltip();
     }
     
     /**
@@ -88,6 +96,193 @@ class CanvasRenderer {
         // Calculate drawable area
         this.drawableWidth = this.width - this.padding.left - this.padding.right;
         this.drawableHeight = this.height - this.padding.top - this.padding.bottom;
+    }
+    
+    /**
+     * Sets up tooltip element and mouse events
+     */
+    setupTooltip() {
+        // Create tooltip element
+        this.tooltip = document.createElement('div');
+        this.tooltip.className = 'canvas-tooltip';
+        this.tooltip.innerHTML = `
+            <div class="canvas-tooltip__row">
+                <span class="canvas-tooltip__label" id="tooltip-label-height">Altura:</span>
+                <span class="canvas-tooltip__value" id="tooltip-height">--</span>
+            </div>
+            <div class="canvas-tooltip__row">
+                <span class="canvas-tooltip__label" id="tooltip-label-distance">Distancia:</span>
+                <span class="canvas-tooltip__value" id="tooltip-distance">--</span>
+            </div>
+            <div class="canvas-tooltip__row">
+                <span class="canvas-tooltip__label" id="tooltip-label-velocity">Velocidad:</span>
+                <span class="canvas-tooltip__value" id="tooltip-velocity">--</span>
+            </div>
+        `;
+        this.canvas.parentElement.appendChild(this.tooltip);
+        
+        // Add event listeners
+        this.canvas.addEventListener('mousemove', this.handleMouseMove);
+        this.canvas.addEventListener('mouseleave', this.handleMouseLeave);
+    }
+    
+    /**
+     * Converts canvas coordinates to physics coordinates
+     * @param {number} canvasX - Canvas X coordinate
+     * @param {number} canvasY - Canvas Y coordinate
+     * @returns {{x: number, y: number}} Physics coordinates in meters
+     */
+    toPhysicsCoords(canvasX, canvasY) {
+        const x = (canvasX - this.padding.left) / this.scale;
+        const y = (this.height - this.padding.bottom - canvasY) / this.scale;
+        return { x, y };
+    }
+    
+    /**
+     * Handles mouse movement over the canvas
+     * @param {MouseEvent} event
+     */
+    handleMouseMove(event) {
+        // Only show tooltip when simulation is paused or completed
+        if (this.isAnimating && !this.isPaused) return;
+        if (this.trajectoryPoints.length === 0) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+        
+        // Convert to physics coordinates
+        const { x: physicsX } = this.toPhysicsCoords(mouseX, mouseY);
+        
+        // Find the closest point on the trajectory
+        let closestPoint = null;
+        let closestDistance = Infinity;
+        
+        for (const point of this.trajectoryPoints) {
+            const distance = Math.abs(point.x - physicsX);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestPoint = point;
+            }
+        }
+        
+        if (closestPoint && closestDistance < 5) { // Within 5 meters tolerance
+            // Calculate velocity at this point
+            const { x: px, y: py } = closestPoint;
+            const { canvasX, canvasY } = this.toCanvasCoords(px, py);
+            
+            // Check if mouse is close to the trajectory line
+            const mouseToTrajectoryDist = Math.abs(mouseY - canvasY);
+            
+            if (mouseToTrajectoryDist < 30) { // Within 30 pixels of trajectory
+                // Calculate velocity at this point using time
+                const time = this.findTimeForX(px);
+                const velocity = this.calculateVelocityAtPoint(time);
+                
+                // Update tooltip
+                this.tooltip.querySelector('#tooltip-label-height').textContent = `${t('tooltipHeightLabel')}:`;
+                this.tooltip.querySelector('#tooltip-label-distance').textContent = `${t('tooltipDistanceLabel')}:`;
+                this.tooltip.querySelector('#tooltip-label-velocity').textContent = `${t('tooltipVelocityLabel')}:`;
+                this.tooltip.querySelector('#tooltip-height').textContent = `${py.toFixed(1)} m`;
+                this.tooltip.querySelector('#tooltip-distance').textContent = `${px.toFixed(1)} m`;
+                this.tooltip.querySelector('#tooltip-velocity').textContent = `${velocity.toFixed(1)} m/s`;
+                
+                // Position tooltip
+                this.tooltip.style.left = `${canvasX + 15}px`;
+                this.tooltip.style.top = `${canvasY - 60}px`;
+                this.tooltip.classList.add('visible');
+                
+                // Draw hover indicator
+                this.renderWithHoverPoint(px, py);
+                return;
+            }
+        }
+        
+        // Hide tooltip if not over trajectory
+        this.tooltip.classList.remove('visible');
+    }
+    
+    /**
+     * Handles mouse leaving the canvas
+     */
+    handleMouseLeave() {
+        this.tooltip.classList.remove('visible');
+        // Redraw without hover point
+        if (!this.isAnimating || this.isPaused) {
+            this.renderFinal();
+        }
+    }
+    
+    /**
+     * Finds the approximate time for a given X position
+     * @param {number} x - X position in meters
+     * @returns {number} Time in seconds
+     */
+    findTimeForX(x) {
+        const vx = this.params.initialVelocity * Math.cos(this.params.launchAngle * Math.PI / 180);
+        return vx > 0 ? x / vx : 0;
+    }
+    
+    /**
+     * Calculates velocity magnitude at a given time
+     * @param {number} time - Time in seconds
+     * @returns {number} Velocity magnitude in m/s
+     */
+    calculateVelocityAtPoint(time) {
+        const angleRad = this.params.launchAngle * Math.PI / 180;
+        const vx = this.params.initialVelocity * Math.cos(angleRad);
+        const vy = this.params.initialVelocity * Math.sin(angleRad) - this.params.gravity * time;
+        return Math.sqrt(vx * vx + vy * vy);
+    }
+    
+    /**
+     * Renders the canvas with a hover point indicator
+     * @param {number} hoverX - X position of hover point
+     * @param {number} hoverY - Y position of hover point
+     */
+    renderWithHoverPoint(hoverX, hoverY) {
+        this.clear();
+        this.drawGrid();
+        this.drawGround();
+        this.drawTrajectory(this.trajectoryPoints);
+        this.drawLauncher(this.params.launchAngle, this.params.initialHeight);
+        
+        // Draw final projectile position
+        const lastPoint = this.trajectoryPoints[this.trajectoryPoints.length - 1];
+        this.drawProjectile(lastPoint.x, Math.max(0, lastPoint.y));
+        
+        // Draw hover point indicator
+        const { canvasX, canvasY } = this.toCanvasCoords(hoverX, hoverY);
+        const ctx = this.ctx;
+        
+        // Draw vertical dashed line
+        ctx.save();
+        ctx.strokeStyle = '#ff6b6b';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(canvasX, canvasY);
+        ctx.lineTo(canvasX, this.height - this.padding.bottom);
+        ctx.stroke();
+        
+        // Draw horizontal dashed line
+        ctx.beginPath();
+        ctx.moveTo(this.padding.left, canvasY);
+        ctx.lineTo(canvasX, canvasY);
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw hover point
+        ctx.fillStyle = '#ff6b6b';
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Inner white circle
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 4, 0, Math.PI * 2);
+        ctx.fill();
     }
     
     /**

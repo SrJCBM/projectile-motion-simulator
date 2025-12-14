@@ -352,22 +352,65 @@ class UIController {
     }
     
     /**
-     * Displays simulation results in the UI
+     * Displays simulation results in the UI with counting animation
      * @param {Object} results - Calculation results
      */
     displayResults(results) {
-        if (this.elements.resultMaxHeight) {
-            this.elements.resultMaxHeight.textContent = results.maxHeight.toFixed(1);
-        }
-        if (this.elements.resultDistance) {
-            this.elements.resultDistance.textContent = results.range.toFixed(1);
-        }
-        if (this.elements.resultFlightTime) {
-            this.elements.resultFlightTime.textContent = results.flightTime.toFixed(2);
-        }
-        if (this.elements.resultFinalVelocity) {
-            this.elements.resultFinalVelocity.textContent = results.finalVelocity.toFixed(1);
-        }
+        const resultCards = document.querySelectorAll('.result-card');
+        
+        // Add counting class for visual feedback
+        resultCards.forEach(card => card.classList.add('counting'));
+        
+        // Animate values with counter effect (staggered)
+        this.animateValue(this.elements.resultMaxHeight, 0, results.maxHeight, 800, 1, 0);
+        this.animateValue(this.elements.resultDistance, 0, results.range, 800, 1, 150);
+        this.animateValue(this.elements.resultFlightTime, 0, results.flightTime, 800, 2, 300);
+        this.animateValue(this.elements.resultFinalVelocity, 0, results.finalVelocity, 800, 1, 450);
+        
+        // Remove counting class after animation completes
+        setTimeout(() => {
+            resultCards.forEach(card => card.classList.remove('counting'));
+        }, 1300);
+    }
+    
+    /**
+     * Animates a number from start to end value
+     * @param {HTMLElement} element - Element to update
+     * @param {number} start - Start value
+     * @param {number} end - End value
+     * @param {number} duration - Animation duration in ms
+     * @param {number} decimals - Number of decimal places
+     * @param {number} delay - Delay before starting animation
+     */
+    animateValue(element, start, end, duration, decimals = 0, delay = 0) {
+        if (!element) return;
+        
+        // Set initial value
+        element.textContent = start.toFixed(decimals);
+        
+        setTimeout(() => {
+            const startTime = performance.now();
+            const diff = end - start;
+            
+            const step = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function for smooth animation
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                
+                const current = start + (diff * easeOutQuart);
+                element.textContent = current.toFixed(decimals);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    element.textContent = end.toFixed(decimals);
+                }
+            };
+            
+            requestAnimationFrame(step);
+        }, delay);
     }
     
     /**
@@ -375,16 +418,16 @@ class UIController {
      */
     clearResults() {
         if (this.elements.resultMaxHeight) {
-            this.elements.resultMaxHeight.textContent = '--';
+            this.elements.resultMaxHeight.textContent = '0.0';
         }
         if (this.elements.resultDistance) {
-            this.elements.resultDistance.textContent = '--';
+            this.elements.resultDistance.textContent = '0.0';
         }
         if (this.elements.resultFlightTime) {
-            this.elements.resultFlightTime.textContent = '--';
+            this.elements.resultFlightTime.textContent = '0.00';
         }
         if (this.elements.resultFinalVelocity) {
-            this.elements.resultFinalVelocity.textContent = '--';
+            this.elements.resultFinalVelocity.textContent = '0.0';
         }
         if (this.elements.currentTime) {
             this.elements.currentTime.textContent = '0.00';

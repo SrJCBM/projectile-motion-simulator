@@ -118,6 +118,9 @@ const translations = {
         tooltipPDF: 'Descargar reporte PDF',
         tooltipLogout: 'Cerrar sesión',
         tooltipHome: 'Ir al inicio',
+        tooltipHeightLabel: 'Altura',
+        tooltipDistanceLabel: 'Distancia',
+        tooltipVelocityLabel: 'Velocidad',
         
         // Gravity options
         gravityEarth: '🌍 Tierra - 9.81 m/s²',
@@ -233,6 +236,9 @@ const translations = {
         tooltipPDF: 'Download PDF report',
         tooltipLogout: 'Log out',
         tooltipHome: 'Go to home',
+        tooltipHeightLabel: 'Height',
+        tooltipDistanceLabel: 'Distance',
+        tooltipVelocityLabel: 'Velocity',
         
         // Gravity options
         gravityEarth: '🌍 Earth - 9.81 m/s²',
