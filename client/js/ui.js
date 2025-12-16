@@ -14,6 +14,7 @@
 
 import { GRAVITY_PRESETS, validateParameters, calculateSimulationResults } from './physics.js';
 import { CanvasRenderer } from './canvas.js';
+import { t } from './i18n.js';
 
 /**
  * UI Controller Class
@@ -181,22 +182,38 @@ class UIController {
      * @param {Event} event - Input event
      */
     handleVelocityChange(event) {
-        let value = parseFloat(event.target.value);
+        const rawValue = event.target.value;
+        let value = parseFloat(rawValue);
+        const controlGroup = event.target.closest('.control-group');
         
-        // Clamp value to valid range
-        value = Math.max(0, Math.min(100, value));
+        // Validate input
+        let errorKey = null;
         
-        // Handle NaN
+        if (rawValue !== '' && isNaN(value)) {
+            errorKey = 'validationInvalidNumber';
+        } else if (value < 0) {
+            errorKey = 'validationVelocityNegative';
+        } else if (value > 100) {
+            errorKey = 'validationVelocityRange';
+        }
+        
+        // Show/hide validation error
+        this.setValidationError(controlGroup, errorKey);
+        
+        // Clamp value to valid range for internal use
         if (isNaN(value)) value = 0;
+        value = Math.max(0, Math.min(100, value));
         
         this.params.initialVelocity = value;
         
-        // Sync both inputs
+        // Sync slider (always valid range)
         if (this.elements.velocitySlider && event.target !== this.elements.velocitySlider) {
             this.elements.velocitySlider.value = value;
         }
-        if (this.elements.velocityInput && event.target !== this.elements.velocityInput) {
+        // Only sync number input if coming from slider
+        if (this.elements.velocityInput && event.target === this.elements.velocitySlider) {
             this.elements.velocityInput.value = value;
+            this.clearValidationError(this.elements.velocityInput.closest('.control-group'));
         }
         
         this.updatePreview();
@@ -208,22 +225,38 @@ class UIController {
      * @param {Event} event - Input event
      */
     handleAngleChange(event) {
-        let value = parseFloat(event.target.value);
+        const rawValue = event.target.value;
+        let value = parseFloat(rawValue);
+        const controlGroup = event.target.closest('.control-group');
         
-        // Clamp value to valid range (0-90 degrees)
-        value = Math.max(0, Math.min(90, value));
+        // Validate input
+        let errorKey = null;
         
-        // Handle NaN
+        if (rawValue !== '' && isNaN(value)) {
+            errorKey = 'validationInvalidNumber';
+        } else if (value < 0) {
+            errorKey = 'validationAngleNegative';
+        } else if (value > 90) {
+            errorKey = 'validationAngleRange';
+        }
+        
+        // Show/hide validation error
+        this.setValidationError(controlGroup, errorKey);
+        
+        // Clamp value to valid range for internal use
         if (isNaN(value)) value = 45;
+        value = Math.max(0, Math.min(90, value));
         
         this.params.launchAngle = value;
         
-        // Sync both inputs
+        // Sync slider (always valid range)
         if (this.elements.angleSlider && event.target !== this.elements.angleSlider) {
             this.elements.angleSlider.value = value;
         }
-        if (this.elements.angleInput && event.target !== this.elements.angleInput) {
+        // Only sync number input if coming from slider
+        if (this.elements.angleInput && event.target === this.elements.angleSlider) {
             this.elements.angleInput.value = value;
+            this.clearValidationError(this.elements.angleInput.closest('.control-group'));
         }
         
         this.updatePreview();
@@ -234,16 +267,29 @@ class UIController {
      * @param {Event} event - Input event
      */
     handleHeightChange(event) {
-        let value = parseFloat(event.target.value);
+        const rawValue = event.target.value;
+        let value = parseFloat(rawValue);
+        const controlGroup = event.target.closest('.control-group');
         
-        // Ensure non-negative
-        value = Math.max(0, value);
+        // Validate input
+        let errorKey = null;
         
-        // Handle NaN
+        if (rawValue !== '' && isNaN(value)) {
+            errorKey = 'validationInvalidNumber';
+        } else if (value < 0) {
+            errorKey = 'validationHeightNegative';
+        } else if (value > 100) {
+            errorKey = 'validationHeightRange';
+        }
+        
+        // Show/hide validation error
+        this.setValidationError(controlGroup, errorKey);
+        
+        // Clamp value to valid range for internal use
         if (isNaN(value)) value = 0;
+        value = Math.max(0, Math.min(100, value));
         
         this.params.initialHeight = value;
-        this.elements.heightInput.value = value;
         
         this.updatePreview();
     }
@@ -263,6 +309,18 @@ class UIController {
      * Handles simulate button click
      */
     handleSimulate() {
+        // Check for validation errors in UI
+        if (this.hasValidationErrors()) {
+            // Focus on first error field
+            const firstError = document.querySelector('.control-group.has-error input');
+            if (firstError) {
+                firstError.focus();
+                firstError.closest('.control-group').classList.add('shake');
+                setTimeout(() => firstError.closest('.control-group').classList.remove('shake'), 400);
+            }
+            return;
+        }
+        
         // Validate parameters
         const validation = validateParameters(this.params);
         if (!validation.valid) {
@@ -527,6 +585,64 @@ class UIController {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+    
+    /**
+     * Sets a validation error on a control group
+     * @param {HTMLElement} controlGroup - The control group element
+     * @param {string|null} errorKey - The i18n key for the error message, or null to clear
+     */
+    setValidationError(controlGroup, errorKey) {
+        if (!controlGroup) return;
+        
+        if (errorKey) {
+            controlGroup.classList.add('has-error');
+            controlGroup.classList.add('shake');
+            
+            // Remove shake after animation
+            setTimeout(() => controlGroup.classList.remove('shake'), 400);
+            
+            // Update or create validation message
+            let msgEl = controlGroup.querySelector('.validation-message');
+            if (!msgEl) {
+                msgEl = document.createElement('div');
+                msgEl.className = 'validation-message';
+                msgEl.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span class="validation-message__text"></span>
+                `;
+                controlGroup.appendChild(msgEl);
+            }
+            
+            const textEl = msgEl.querySelector('.validation-message__text');
+            if (textEl) {
+                textEl.textContent = t(errorKey);
+            }
+        } else {
+            this.clearValidationError(controlGroup);
+        }
+    }
+    
+    /**
+     * Clears validation error from a control group
+     * @param {HTMLElement} controlGroup - The control group element
+     */
+    clearValidationError(controlGroup) {
+        if (!controlGroup) return;
+        controlGroup.classList.remove('has-error');
+        controlGroup.classList.remove('shake');
+    }
+    
+    /**
+     * Checks if there are any validation errors
+     * @returns {boolean} True if there are errors
+     */
+    hasValidationErrors() {
+        return document.querySelectorAll('.control-group.has-error').length > 0;
     }
     
     /**

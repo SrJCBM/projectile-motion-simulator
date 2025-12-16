@@ -259,6 +259,7 @@ body {
 
 .control-group {
     margin-bottom: var(--spacing-lg);
+    position: relative;
 }
 
 .control-label {
@@ -267,6 +268,87 @@ body {
     font-weight: var(--font-weight-medium);
     color: var(--color-gray-600);
     margin-bottom: var(--spacing-sm);
+}
+
+/* ========================
+   Input Validation States
+   ======================== */
+.control-group.has-error .number-input,
+.control-group.has-error .slider {
+    border-color: var(--color-error);
+    background-color: rgba(231, 111, 81, 0.05);
+}
+
+.control-group.has-error .number-input:focus {
+    box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.2);
+    border-color: var(--color-error);
+}
+
+.control-group.has-error .control-label {
+    color: var(--color-error);
+}
+
+.validation-message {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px 10px;
+    font-size: var(--font-size-xs);
+    color: var(--color-error);
+    background: rgba(231, 111, 81, 0.08);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-error);
+    animation: slideIn 0.2s ease-out;
+}
+
+.validation-message svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.control-group.has-error .validation-message {
+    display: flex;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.control-group.shake {
+    animation: shake 0.4s ease-in-out;
+}
+
+/* Slider error state */
+.control-group.has-error .slider::-webkit-slider-thumb {
+    background: var(--color-error);
+}
+
+.control-group.has-error .slider::-moz-range-thumb {
+    background: var(--color-error);
+}
+
+[data-theme="dark"] .validation-message {
+    background: rgba(231, 111, 81, 0.15);
+    color: #ff8a70;
+}
+
+[data-theme="dark"] .control-group.has-error .number-input {
+    background-color: rgba(231, 111, 81, 0.1);
 }
 
 .control-input-group {
