@@ -289,6 +289,20 @@ async function downloadPDF() {
     const params = app.ui.getParams();
     const results = app.ui.renderer.calculateResults();
     
+    // Get current language for localized PDF
+    const currentLang = localStorage.getItem('preferredLang') || 'es';
+    
+    // Capture canvas as base64 image
+    const canvas = document.getElementById('simulation-canvas');
+    let canvasImage = null;
+    if (canvas) {
+        try {
+            canvasImage = canvas.toDataURL('image/png');
+        } catch (e) {
+            console.warn('Could not capture canvas:', e);
+        }
+    }
+    
     try {
         showLoading();
         
@@ -314,7 +328,9 @@ async function downloadPDF() {
                     range: results.range,
                     flightTime: results.flightTime,
                     finalVelocity: results.finalVelocity
-                }
+                },
+                lang: currentLang,
+                canvasImage: canvasImage
             })
         });
         
