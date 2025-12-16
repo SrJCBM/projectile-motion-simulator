@@ -193,7 +193,7 @@ class UIController {
             errorKey = 'validationInvalidNumber';
         } else if (value < 0) {
             errorKey = 'validationVelocityNegative';
-        } else if (value > 100) {
+        } else if (value > 200) {
             errorKey = 'validationVelocityRange';
         }
         
@@ -202,7 +202,7 @@ class UIController {
         
         // Clamp value to valid range for internal use
         if (isNaN(value)) value = 0;
-        value = Math.max(0, Math.min(100, value));
+        value = Math.max(0, Math.min(200, value));
         
         this.params.initialVelocity = value;
         
@@ -278,7 +278,7 @@ class UIController {
             errorKey = 'validationInvalidNumber';
         } else if (value < 0) {
             errorKey = 'validationHeightNegative';
-        } else if (value > 100) {
+        } else if (value > 200) {
             errorKey = 'validationHeightRange';
         }
         
@@ -287,7 +287,7 @@ class UIController {
         
         // Clamp value to valid range for internal use
         if (isNaN(value)) value = 0;
-        value = Math.max(0, Math.min(100, value));
+        value = Math.max(0, Math.min(200, value));
         
         this.params.initialHeight = value;
         

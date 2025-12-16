@@ -98,12 +98,12 @@ const translations = {
         confirmDelete: '¿Estás seguro de que deseas eliminar esta simulación?',
         
         // Validation messages
-        validationVelocityRange: 'La velocidad debe estar entre 0 y 100 m/s',
+        validationVelocityRange: 'La velocidad debe estar entre 0 y 200 m/s',
         validationVelocityNegative: 'La velocidad no puede ser negativa',
         validationAngleRange: 'El ángulo debe estar entre 0° y 90°',
         validationAngleNegative: 'El ángulo no puede ser negativo',
         validationHeightNegative: 'La altura no puede ser negativa',
-        validationHeightRange: 'La altura debe estar entre 0 y 100 m',
+        validationHeightRange: 'La altura debe estar entre 0 y 200 m',
         validationInvalidNumber: 'Por favor ingresa un número válido',
         
         // Footer
@@ -226,12 +226,12 @@ const translations = {
         confirmDelete: 'Are you sure you want to delete this simulation?',
         
         // Validation messages
-        validationVelocityRange: 'Velocity must be between 0 and 100 m/s',
+        validationVelocityRange: 'Velocity must be between 0 and 200 m/s',
         validationVelocityNegative: 'Velocity cannot be negative',
         validationAngleRange: 'Angle must be between 0° and 90°',
         validationAngleNegative: 'Angle cannot be negative',
         validationHeightNegative: 'Height cannot be negative',
-        validationHeightRange: 'Height must be between 0 and 100 m',
+        validationHeightRange: 'Height must be between 0 and 200 m',
         validationInvalidNumber: 'Please enter a valid number',
         
         // Footer

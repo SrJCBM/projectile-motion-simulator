@@ -369,8 +369,9 @@ class CanvasRenderer {
         const scaleY = this.drawableHeight / paddedMaxY;
         
         // Use the smaller scale to ensure everything fits
-        this.scale = Math.min(scaleX, scaleY, 20); // Max scale of 20
-        this.scale = Math.max(this.scale, 2); // Min scale of 2
+        // Allow very small scales for large trajectories (up to 1000m distance, 200m height)
+        this.scale = Math.min(scaleX, scaleY, 20); // Max scale of 20 (for small trajectories)
+        this.scale = Math.max(this.scale, 0.3); // Min scale of 0.3 (for large trajectories up to ~1000m)
     }
     
     /**
@@ -387,11 +388,14 @@ class CanvasRenderer {
     drawGrid() {
         const ctx = this.ctx;
         
-        // Calculate grid spacing based on scale
+        // Calculate grid spacing based on scale - improved for large distances
         let gridSpacing = 5; // meters
-        if (this.scale < 5) gridSpacing = 10;
-        if (this.scale < 3) gridSpacing = 20;
-        if (this.scale > 15) gridSpacing = 2;
+        if (this.scale < 0.5) gridSpacing = 200;      // Very large: 1000m range
+        else if (this.scale < 1) gridSpacing = 100;   // Large: 500m range
+        else if (this.scale < 2) gridSpacing = 50;    // Medium-large: 250m range
+        else if (this.scale < 3) gridSpacing = 20;    // Medium: 100m range
+        else if (this.scale < 5) gridSpacing = 10;    // Small-medium
+        else if (this.scale > 15) gridSpacing = 2;    // Very small trajectories
         
         const gridPixels = gridSpacing * this.scale;
         

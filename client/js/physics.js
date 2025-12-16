@@ -287,8 +287,8 @@ function calculateSimulationResults({ initialVelocity, launchAngle, initialHeigh
 function validateParameters({ initialVelocity, launchAngle, initialHeight, gravity }) {
     const errors = [];
     
-    if (initialVelocity < 0 || initialVelocity > 100) {
-        errors.push('Initial velocity must be between 0 and 100 m/s');
+    if (initialVelocity < 0 || initialVelocity > 200) {
+        errors.push('Initial velocity must be between 0 and 200 m/s');
     }
     
     if (launchAngle < 0 || launchAngle > 90) {
